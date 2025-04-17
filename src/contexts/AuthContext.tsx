@@ -2,9 +2,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signin } from '../services/auth.service';
 
 interface User {
-    userId: string;
-    email: string;
+    id: string;
+    firstName: string;
+    lastName: string;
     role: string;
+    token: string;
 }
 
 interface AuthContextType {
