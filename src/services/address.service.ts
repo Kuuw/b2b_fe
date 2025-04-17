@@ -7,6 +7,11 @@ export const getAddresses = async () => {
     return response.data;
 };
 
+export const getSelfAddresses = async () => {
+    const response = await api.get('/Address/GetSelf');
+    return response.data;
+};
+
 export const getAddress = async (id: string) => {
     const response = await api.get(`/Address/${id}`);
     return response.data;

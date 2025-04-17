@@ -23,9 +23,6 @@ export interface Order {
 }
 
 export interface OrderCreate {
-    orderId: string;
-    userId: string;
-    statusId: string;
     shippingAddressId: string;
     invoiceAddressId: string;
     orderItems: OrderItemCreate[];

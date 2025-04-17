@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getOrders } from '../../../services';
+import { selfGetOrder } from '../../../services';
 import { Order } from '../../../models/order';
 import Card from '../../atoms/Card';
 import Title from '../../atoms/Title';
@@ -20,7 +20,7 @@ const Orders: React.FC<OrdersProps> = ({ className }) => {
         const fetchOrders = async () => {
             try {
                 setIsLoading(true);
-                const response = await getOrders();
+                const response = await selfGetOrder();
                 setOrders(response);
             } catch (error) {
                 console.error('Error fetching orders:', error);

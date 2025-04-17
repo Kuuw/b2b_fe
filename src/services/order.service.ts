@@ -11,10 +11,20 @@ export const getOrder = async (id: string) => {
     return response.data;
 };
 
+export const selfGetOrder = async () => {
+    const response = await api.get(`/Order`);
+    return response.data;
+};
+
 export const createOrder = async (order: OrderCreate) => {
     const response = await api.post('/Order', order);
     return response.data;
 };
+
+export const selfCreateOrder = async (order: OrderCreate) => {
+    const response = await api.post('/Order/Create', order);
+    return response.data;
+}
 
 export const updateOrder = async (order: OrderUpdate) => {
     const response = await api.put('/Order', order);

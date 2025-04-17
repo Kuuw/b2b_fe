@@ -12,6 +12,8 @@ export interface User {
     company: Company;
     role: Role;
     status: Status;
+    defaultShippingAddressId?: string;
+    defaultInvoiceAddressId?: string;
 }
 
 export interface UserRegister {

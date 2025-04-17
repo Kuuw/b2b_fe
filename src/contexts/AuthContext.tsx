@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { signin } from '../services/auth.service';
+import Cookies from 'js-cookie';
 
-interface User {
+export interface User {
     id: string;
     firstName: string;
     lastName: string;
@@ -23,34 +24,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         if (token) {
             // TODO: Validate token with backend
-            setIsAuthenticated(true);
+            // For now, we'll decode the token to get user info
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                        .split('')
+                        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                        .join('')
+                );
+                const payload = JSON.parse(jsonPayload);
+                setUser({
+                    id: payload.UserId,
+                    firstName: payload.FirstName,
+                    lastName: payload.LastName,
+                    role: payload.Role,
+                    token: token
+                });
+                setIsAuthenticated(true);
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                Cookies.remove('token');
+            }
         }
     }, []);
 
     const login = async (email: string, password: string) => {
-        var loginRequest = signin({ email, password });
-        loginRequest.then((response) => {
-            if (response.status === 200) {
-                const userData = response.data;
-                setUser(userData);
-                setIsAuthenticated(true);
-                localStorage.setItem('token', userData.token);
-            } else {
-                throw new Error('Invalid credentials');
-            }
-        }).catch((error) => {
+        try {
+            const response = await signin({ email, password });
+            console.log('Response:', response);
+            const userData = response;
+            setUser(userData);
+            setIsAuthenticated(true);
+            Cookies.set('token', userData.token, { expires: 7 });
+        } catch (error) {
             console.error('Login failed', error);
             throw error;
-        });
+        }
     };
 
     const logout = () => {
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem('token');
+        Cookies.remove('token');
     };
 
     return (

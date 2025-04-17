@@ -6,6 +6,7 @@ import { CartProvider } from './contexts/CartContext';
 import Login from './components/pages/Login';
 import { Products, ProductDetail } from './components/pages/Products';
 import Cart from './components/pages/Cart/Cart';
+import Checkout from './components/pages/Checkout/Checkout';
 import Navbar from './components/molecules/Navbar';
 import './index.css';
 import Orders from './components/pages/Orders/Orders';
@@ -70,6 +71,16 @@ const AppContent = () => {
           element={
             isAuthenticated ? (
               <Cart />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            isAuthenticated ? (
+              <Checkout />
             ) : (
               <Navigate to="/login" replace />
             )
