@@ -73,11 +73,11 @@ const Orders: React.FC<OrdersProps> = ({ className }) => {
     ];
 
     return (
-        <div className={clsx("container mx-auto px-4 py-8", className)}>
+        <div className={clsx("container mx-auto px-4 py-8 bg-gray-50", className)}>
             <div className="mb-6">
                 <Title variant="h2">Orders</Title>
             </div>
-            
+
             <Card padding="medium">
                 <Table
                     data={orders}

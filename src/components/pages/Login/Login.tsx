@@ -15,7 +15,7 @@ const Login: React.FC<LoginProps> = ({ className }) => {
 
   const handleLogin = async (data: UserLogin) => {
     try {
-      await login(data);
+      await login(data.email, data.password);
       navigate('/products');
     } catch (err) {
       setError('Invalid email or password');

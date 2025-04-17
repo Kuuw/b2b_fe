@@ -1,36 +1,58 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import cookies from 'react-cookies';
-import { login as authLogin, logout as authLogout } from '../services';
-import { UserLogin } from '../models/user';
+import { signin } from '../services/auth.service';
+
+interface User {
+    userId: string;
+    email: string;
+    role: string;
+}
 
 interface AuthContextType {
+    user: User | null;
     isAuthenticated: boolean;
-    login: (data: UserLogin) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const token = cookies.load('token');
-        setIsAuthenticated(!!token);
+        const token = localStorage.getItem('token');
+        if (token) {
+            // TODO: Validate token with backend
+            setIsAuthenticated(true);
+        }
     }, []);
 
-    const login = async (data: UserLogin) => {
-        await authLogin(data);
-        setIsAuthenticated(true);
+    const login = async (email: string, password: string) => {
+        var loginRequest = signin({ email, password });
+        loginRequest.then((response) => {
+            if (response.status === 200) {
+                const userData = response.data;
+                setUser(userData);
+                setIsAuthenticated(true);
+                localStorage.setItem('token', userData.token);
+            } else {
+                throw new Error('Invalid credentials');
+            }
+        }).catch((error) => {
+            console.error('Login failed', error);
+            throw error;
+        });
     };
 
     const logout = () => {
-        authLogout();
+        setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem('token');
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

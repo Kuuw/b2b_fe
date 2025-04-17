@@ -1,6 +1,7 @@
 import React from 'react';
 import { Product } from '../../../models/product';
 import Table, { TableColumn } from '../../atoms/Table';
+import AddToCartButton from '../../atoms/AddToCartButton/AddToCartButton';
 import { ProductTableProps } from './ProductTable.types';
 import clsx from 'clsx';
 
@@ -66,6 +67,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 )}>
                     {product.status.statusName}
                 </span>
+            )
+        },
+        {
+            header: 'Actions',
+            accessor: (product) => (
+                <div className="flex items-center space-x-2">
+                    <AddToCartButton product={product} />
+                </div>
             )
         }
     ];
