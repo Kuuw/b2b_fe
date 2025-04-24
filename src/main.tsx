@@ -10,10 +10,14 @@ import Checkout from './components/pages/Checkout/Checkout';
 import Navbar from './components/molecules/Navbar';
 import './index.css';
 import Orders from './components/pages/Orders/Orders';
+import OrderDetail from './components/pages/Orders/OrderDetail';
 import Admin from './components/pages/Admin/Admin';
 import AdminProducts from './components/pages/Admin/Products/Products';
 import AdminCategories from './components/pages/Admin/Categories/Categories';
 import AdminImages from './components/pages/Admin/Images/Images';
+import AdminUsers from './components/pages/Admin/Users/Users';
+import AdminOrders from './components/pages/Admin/Orders/Orders';
+import AdminOrderDetail from './components/pages/Admin/Orders/OrderDetail';
 import { isAdmin } from './utils/jwt';
 
 const App = () => {
@@ -97,6 +101,16 @@ const AppContent = () => {
           }
         />
         <Route
+          path="/orders/:orderId"
+          element={
+            isAuthenticated ? (
+              <OrderDetail />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
           path="/admin"
           element={
             isAuthenticated && userIsAdmin ? (
@@ -117,6 +131,18 @@ const AppContent = () => {
           <Route
             path="images"
             element={<AdminImages />}
+          />
+          <Route
+            path="orders"
+            element={<AdminOrders />}
+          />
+          <Route
+            path="orders/:orderId"
+            element={<AdminOrderDetail />}
+          />
+          <Route
+            path="users"
+            element={<AdminUsers />}
           />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
