@@ -2,7 +2,7 @@ import api from './api.config';
 import { Company, CompanyCreate, CompanyUpdate } from '../models/company';
 
 export const getCompanies = async () => {
-    const response = await api.get('/Company');
+    const response = await api.get('/Company/GetAll');
     return response.data;
 };
 
