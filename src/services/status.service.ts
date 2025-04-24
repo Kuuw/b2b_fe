@@ -2,7 +2,7 @@ import api from './api.config';
 import { Status } from '../models/status';
 
 export const getStatuses = async () => {
-    const response = await api.get('/Status');
+    const response = await api.get('/Status/GetAll');
     return response.data;
 };
 
