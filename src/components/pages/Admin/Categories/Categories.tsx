@@ -2,13 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '../../../atoms';
 import ButtonStyles from '../../../atoms/Button/Button.styles';
 import { getCategories } from '@/services';
+import { Category } from '@/models/category';
 
-interface Category {
-    id: string;
-    name: string;
-    description: string;
-    productCount: number;
-}
 
 const Categories: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -19,7 +14,7 @@ const Categories: React.FC = () => {
         try {
             setIsLoading(true);
             const response = await getCategories(1, 100); // Get all categories
-            setCategories(response.items || []);
+            setCategories(response || []);
         } catch (error) {
             console.error('Error loading categories:', error);
             setCategories([]);
@@ -57,9 +52,6 @@ const Categories: React.FC = () => {
                                 Description
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Products
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
                             </th>
                         </tr>
@@ -74,18 +66,17 @@ const Categories: React.FC = () => {
                         ) : (
                             categories.map((category) => (
                                 <tr key={category.id} className="text-gray-900">
-                                    <td className="px-6 py-4 whitespace-nowrap">{category.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{category.description}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{category.productCount}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{category.categoryName}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{category.categoryDescription}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <Button
                                             label="Edit"
-                                            onClick={() => {}}
+                                            onClick={() => { }}
                                             className="mr-2"
                                         />
                                         <Button
                                             label="Delete"
-                                            onClick={() => {}}
+                                            onClick={() => { }}
                                             variant={ButtonStyles.Red}
                                         />
                                     </td>
