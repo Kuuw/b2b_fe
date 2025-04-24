@@ -1,8 +1,10 @@
 import api from './api.config';
 import { User, UserCreate, UserUpdate } from '../models/user';
 
-export const getUsers = async () => {
-    const response = await api.get('/User');
+export const getUsers = async (page: number, pageSize: number) => {
+    const response = await api.get('/User/GetPaged', {
+        params: { page, pageSize },
+    });
     return response.data;
 };
 
