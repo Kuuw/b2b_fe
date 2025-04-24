@@ -16,6 +16,11 @@ export const selfGetOrder = async () => {
     return response.data;
 };
 
+export const selfGetOrderOne = async (id: string) => {
+    const response = await api.get(`/Order/GetOne/${id}`);
+    return response.data;
+};
+
 export const createOrder = async (order: OrderCreate) => {
     const response = await api.post('/Order', order);
     return response.data;
@@ -34,4 +39,11 @@ export const updateOrder = async (order: OrderUpdate) => {
 export const deleteOrder = async (id: string) => {
     const response = await api.delete(`/Order/${id}`);
     return response.data;
-}; 
+};
+
+export const getOrdersAdmin = async (page: number, pageSize: number, StatusId: string) => {
+    const response = await api.get('/Order/GetPaged', {
+        params: { page, pageSize, StatusId },
+    });
+    return response.data;
+}
