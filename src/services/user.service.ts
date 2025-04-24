@@ -21,4 +21,9 @@ export const createUser = async (user: UserCreate) => {
 export const updateUser = async (user: UserUpdate) => {
     const response = await api.put('/User', user);
     return response.data;
+};
+
+export const deleteUser = async (id: string) => {
+    const response = await api.delete(`/User/${id}`);
+    return response.data;
 }; 
