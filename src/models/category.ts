@@ -1,7 +1,7 @@
 export interface Category {
     categoryId: string;
     categoryName: string;
-    description?: string;
+    categoryDescription?: string;
     createdAt: string;
     updatedAt: string;
 } 
