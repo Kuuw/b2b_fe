@@ -2,7 +2,7 @@ import api from './api.config';
 import { Role, RoleCreate, RoleUpdate } from '../models/role';
 
 export const getRoles = async () => {
-    const response = await api.get('/Role');
+    const response = await api.get('/Role/GetAll');
     return response.data;
 };
 
