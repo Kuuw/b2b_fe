@@ -1,8 +1,10 @@
 import api from './api.config';
 import { Company, CompanyCreate, CompanyUpdate } from '../models/company';
 
-export const getCompanies = async () => {
-    const response = await api.get('/Company/GetAll');
+export const getCompanies = async (page: number, pageSize: number) => {
+    const response = await api.get('/Company/GetPaged', {
+        params: { page, pageSize },
+    });
     return response.data;
 };
 
