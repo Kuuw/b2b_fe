@@ -163,11 +163,11 @@ const OrderDetail: React.FC = () => {
                                         <div>
                                             <h4 className="font-semibold text-gray-900">{item.product.productName}</h4>
                                             <p className="text-gray-500">Quantity: {item.quantity}</p>
-                                            <p className="text-gray-500">Unit Price: ${item.unitPrice}</p>
+                                            <p className="text-gray-500">Unit Price: ${item.product.price}</p>
                                         </div>
                                     </div>
                                     <p className="text-lg font-semibold text-gray-900">
-                                        ${(item.quantity * item.unitPrice).toFixed(2)}
+                                        ${(item.quantity * item.product.price).toFixed(2)}
                                     </p>
                                 </div>
                             ))}
@@ -187,7 +187,7 @@ const OrderDetail: React.FC = () => {
                                 <span>Total Amount:</span>
                                 <span className="text-xl font-semibold">
                                     ${order.orderItems.reduce(
-                                        (sum, item) => sum + (item.quantity * item.unitPrice),
+                                        (sum, item) => sum + (item.quantity * item.product.price),
                                         0
                                     ).toFixed(2)}
                                 </span>
