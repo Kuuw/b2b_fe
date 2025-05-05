@@ -4,6 +4,8 @@ import { Product, ProductCreate, ProductUpdate } from '../../../../models/produc
 import { createProduct, updateProduct } from '../../../../services/product.service';
 import { getCategories } from '../../../../services/category.service';
 import { Category } from '../../../../models/category';
+import { Status } from '../../../../models/status';
+import { getStatuses } from '@/services';
 
 interface ProductFormProps {
     product: Product | null;
@@ -19,9 +21,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
     const [categoryId, setCategoryId] = useState('');
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [statusId, setStatusId] = useState('');
+    const [status, setStatus] = useState<Status[]>([]);
 
     useEffect(() => {
         loadCategories();
+        loadStatuses();
         if (product) {
             setProductName(product.productName);
             setProductCode(product.productCode);
@@ -41,6 +46,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
         }
     };
 
+    const loadStatuses = async () => {
+        try {
+            const data = await getStatuses();
+            setStatus(data);
+        } catch (error) {
+            console.error('Error loading statuses:', error);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -56,7 +70,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
                     minOrderQuantity: parseInt(minOrderQuantity),
                     categoryId,
                     currency: 'USD',
-                    statusId: product.status.statusId,
+                    statusId: statusId,
                 };
                 await updateProduct(updatedProduct);
             } else {
@@ -68,7 +82,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
                     minOrderQuantity: parseInt(minOrderQuantity),
                     categoryId,
                     currency: 'USD',
-                    statusId: '1', // Active status
+                    statusId,
                 };
                 await createProduct(newProduct);
             }
@@ -155,11 +169,28 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit }) => {
                 </select>
             </div>
 
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Status</label>
+                <select
+                    value={statusId}
+                    onChange={(e) => setStatusId(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    required
+                >
+                    <option value="">Select a status</option>
+                    {status.map((status) => (
+                        <option key={status.statusId} value={status.statusId}>
+                            {status.statusName}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="flex justify-end space-x-4">
                 <Button
                     label={isLoading ? "Saving..." : (product ? "Update" : "Create")}
                     disabled={isLoading}
-                    onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                    onClick={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                 />
             </div>
         </form>
