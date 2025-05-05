@@ -17,13 +17,10 @@ const Orders: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(10);
-    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [selectedStatus, setSelectedStatus] = useState<string>('89C78A87-FAB4-4E6F-B62E-9D84D1A2DE63');
 
     useEffect(() => {
         loadStatuses();
-    }, []);
-
-    useEffect(() => {
         loadOrders();
     }, [currentPage, selectedStatus]);
 
@@ -118,7 +115,6 @@ const Orders: React.FC = () => {
                         onChange={(e) => setSelectedStatus(e.target.value)}
                         className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
-                        <option value={undefined}>All Statuses</option>
                         {statuses.map((status) => (
                             <option key={status.statusId} value={status.statusId}>
                                 {status.statusName}
