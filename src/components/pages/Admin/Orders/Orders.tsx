@@ -5,7 +5,6 @@ import { getStatuses } from '@/services/status.service';
 import { Order } from '@/models/order';
 import { Status } from '@/models/status';
 import Card from '@/components/atoms/Card';
-import Title from '@/components/atoms/Title';
 import Table, { TableColumn } from '@/components/atoms/Table';
 import Button from '@/components/atoms/Button/Button';
 import ButtonStyles from '@/components/atoms/Button/Button.styles';
