@@ -9,7 +9,7 @@ const CartIcon: React.FC = () => {
     return (
         <button
             onClick={() => navigate('/cart')}
-            className="relative p-2 text-gray-600 hover:text-gray-900"
+            className="relative p-2 text-gray-700 hover:text-gray-900 bg-gray-300"
         >
             <svg
                 xmlns="http://www.w3.org/2002000/svg"
