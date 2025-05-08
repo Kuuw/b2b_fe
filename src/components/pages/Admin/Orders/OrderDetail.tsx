@@ -125,6 +125,8 @@ const OrderDetail: React.FC = () => {
                                 <div>
                                     <p className="text-sm text-gray-500">Customer</p>
                                     <p className="font-medium text-black">{order.user.email}</p>
+                                    <p className="font-medium text-black">{order.user.firstName} {order.user.lastName}</p>
+                                    <p className="font-medium text-black">Company: {order.user.company.companyName}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Status</p>
