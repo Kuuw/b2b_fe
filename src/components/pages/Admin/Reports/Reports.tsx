@@ -3,8 +3,6 @@ import { getReports } from '@/services/company.service';
 import Card from '@/components/atoms/Card';
 import Table, { TableColumn } from '@/components/atoms/Table';
 import Title from '@/components/atoms/Title';
-import Button from '@/components/atoms/Button';
-import ButtonStyles from '@/components/atoms/Button/Button.styles';
 
 interface Report {
     companyId: string;
@@ -13,6 +11,7 @@ interface Report {
     averageSpent: number;
     totalSpent: number;
     totalOrders: number;
+    lastOrderDate: string | null;
 }
 
 const Reports: React.FC = () => {
@@ -38,6 +37,24 @@ const Reports: React.FC = () => {
         fetchReports();
     }, [currentPage]);
 
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    };
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'No orders';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
     const columns: TableColumn<Report>[] = [
         {
             header: 'Company Name',
@@ -48,17 +65,21 @@ const Reports: React.FC = () => {
             accessor: (report) => report.userCount
         },
         {
-            header: 'Average Spent',
-            accessor: (report) => `${report.averageSpent.toFixed(2)}`
-        },
-        {
             header: 'Total Orders',
             accessor: (report) => report.totalOrders
         },
         {
-            header: 'Total Spent',
-            accessor: (report) => `$${report.totalSpent.toFixed(2)}`
+            header: 'Average Spent',
+            accessor: (report) => formatCurrency(report.averageSpent)
         },
+        {
+            header: 'Total Spent',
+            accessor: (report) => formatCurrency(report.totalSpent)
+        },
+        {
+            header: 'Last Order',
+            accessor: (report) => formatDate(report.lastOrderDate)
+        }
     ];
 
     return (
