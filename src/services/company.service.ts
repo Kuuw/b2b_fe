@@ -23,6 +23,13 @@ export const updateCompany = async (company: CompanyUpdate) => {
     return response.data;
 };
 
+export const getReports = async (page: number, pageSize: number) => {
+    const response = await api.get('/Company/GetReports', {
+        params: { page, pageSize },
+    });
+    return response.data;
+}
+
 export const deleteCompany = async (id: string) => {
     const response = await api.delete(`/Company/${id}`);
     return response.data;
