@@ -74,6 +74,17 @@ const Admin: React.FC = () => {
                     >
                         Companies
                     </NavLink>
+                    <NavLink
+                        to="/admin/reports"
+                        className={({ isActive }) =>
+                            clsx('px-4 py-2 rounded-md', {
+                                'bg-blue-100 text-blue-700 border border-blue-300': isActive,
+                                'bg-white text-gray-700 hover:bg-gray-100': !isActive,
+                            })
+                        }
+                    >
+                        Reports
+                    </NavLink>
                 </div>
                 <div className="bg-white rounded-lg shadow p-6 text-gray-900">
                     <Outlet />
