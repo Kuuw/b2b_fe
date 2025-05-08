@@ -64,7 +64,7 @@ const Orders: React.FC<OrdersProps> = ({ className }) => {
             header: 'Total Amount',
             accessor: (order) => {
                 const total = order.orderItems.reduce(
-                    (sum, item) => sum + (item.quantity * item.unitPrice),
+                    (sum, item) => sum + (item.quantity * item.product.price),
                     0
                 );
                 return `$${total.toFixed(2)}`;
