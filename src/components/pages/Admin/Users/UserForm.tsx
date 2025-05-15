@@ -52,7 +52,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit }) => {
 
     const loadCompanies = async () => {
         try {
-            const data = await getCompanies();
+            const data = await getCompanies(1, 100);
             setCompanies(data);
         } catch (error) {
             console.error('Error loading companies:', error);
@@ -216,7 +216,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, onSubmit }) => {
                 <Button
                     label={isLoading ? "Saving..." : (user ? "Update" : "Create")}
                     disabled={isLoading}
-                    onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                    onClick={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                 />
             </div>
         </form>
