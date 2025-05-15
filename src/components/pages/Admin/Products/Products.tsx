@@ -2,27 +2,74 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../atoms';
 import ButtonStyles from '../../../atoms/Button/Button.styles';
-import { getProducts, deleteProduct } from '@/services/product.service';
+import { getProducts, deleteProduct, filter } from '@/services/product.service';
 import { Product } from '@/models/product';
 import Modal from '@/components/molecules/Modal/Modal';
 import ProductForm from './ProductForm';
+import { set } from 'lodash';
+import Pagination from '@/components/atoms/Pagination';
+import { getCategories } from '@/services';
+
 
 const Products: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [categories, setCategories] = useState([]);
+    const [filter, setFilter] = useState<filter>({});
     const navigate = useNavigate();
+    const [debouncedFilter, setDebouncedFilter] = useState<filter>({});
+
+    // Debounce filter changes
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedFilter(filter);
+        }, 500); // 500ms debounce
+
+        return () => clearTimeout(handler);
+    }, [filter]);
 
     useEffect(() => {
         loadProducts();
+    }, [debouncedFilter, page]);
+
+    const loadCategories = async () => {
+        try {
+            const response = await getCategories();
+            setCategories(response);
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
+    }
+
+    useEffect(() => {
+        loadCategories();
     }, []);
+
+    useEffect(() => {
+        loadProducts();
+    }, [debouncedFilter, page]);
+
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { value } = e.target;
+        setFilter((prev: any) => ({
+            ...prev,
+            categoryId: value === '' ? undefined : value,
+        }));
+        setPage(1);
+    }
 
     const loadProducts = async () => {
         try {
             setIsLoading(true);
-            const response = await getProducts(1, 100); // Get all products
+            const response = await getProducts(page, pageSize, filter);
             setProducts(response.items);
+            setTotalPages(response.totalPages);
+            setPageSize(response.pageSize);
         } catch (error) {
             console.error('Error loading products:', error);
         } finally {
@@ -33,6 +80,15 @@ const Products: React.FC = () => {
     const handleEdit = (product: Product) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
+    };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFilter((prev: any) => ({
+            ...prev,
+            [name]: value === '' ? undefined : name.includes('Price') ? Number(value) : value,
+        }));
+        setPage(1);
     };
 
     const handleDelete = async (id: string) => {
@@ -70,6 +126,65 @@ const Products: React.FC = () => {
                         setSelectedProduct(null);
                         setIsModalOpen(true);
                     }}
+                />
+            </div>
+
+            <div className="mb-4 flex flex-wrap gap-4 items-end">
+                <div>
+                    <label className="block text-xs mb-1">Product Name</label>
+                    <input
+                        type="text"
+                        name="productName"
+                        value={filter.productName || ''}
+                        onChange={handleFilterChange}
+                        className="border px-2 py-1 rounded"
+                        placeholder="Product Name"
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs mb-1">Category</label>
+                    <select
+                        name="categoryId"
+                        value={filter.categoryId || ''}
+                        onChange={handleCategoryChange}
+                        className="border px-2 py-1 rounded"
+                    >
+                        <option value="">All Categories</option>
+                        {categories.map((category: any) => (
+                            <option key={category.categoryId} value={category.categoryId}>
+                                {category.categoryName}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-xs mb-1">Min Price</label>
+                    <input
+                        type="number"
+                        name="minPrice"
+                        value={filter.minPrice ?? ''}
+                        onChange={handleFilterChange}
+                        className="border px-2 py-1 rounded"
+                        placeholder="Min"
+                        min={0}
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs mb-1">Max Price</label>
+                    <input
+                        type="number"
+                        name="maxPrice"
+                        value={filter.maxPrice ?? ''}
+                        onChange={handleFilterChange}
+                        className="border px-2 py-1 rounded"
+                        placeholder="Max"
+                        min={0}
+                    />
+                </div>
+                <Button
+                    label="Clear"
+                    onClick={() => setFilter({})}
+                    className="ml-2"
                 />
             </div>
 
@@ -125,6 +240,15 @@ const Products: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
+                {totalPages > 0 && (
+                    <div className="mt-4 flex justify-center">
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
+                )}
             </div>
 
             <Modal
