@@ -16,7 +16,7 @@ type BaseFormFieldProps = {
 };
 
 export type FormFieldProps = BaseFormFieldProps & (
-  | (InputHTMLAttributes<HTMLInputElement> & { type?: 'text' | 'email' | 'password' | 'tel' })
+  | (InputHTMLAttributes<HTMLInputElement> & { type?: 'text' | 'email' | 'password' | 'tel' | 'date' })
   | (SelectHTMLAttributes<HTMLSelectElement> & { type: 'select' })
 );
 
