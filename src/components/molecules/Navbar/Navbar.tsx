@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
                                     })
                                 }
                             >
-                                Admin
+                                Dashboard
                             </NavLink>
                         )}
                     </div>
