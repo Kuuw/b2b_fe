@@ -45,6 +45,17 @@ const Reports: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
 
+    const exportToExcel = () => {
+        // Prepare the data for export
+        const data = reports.map(report => ({
+            'Company Name': report.companyName,
+            'User Count': report.userCount,
+            'Total Orders': report.totalOrders,
+            'Average Spent': report.averageSpent,
+            'Total Spent': report.totalSpent,
+            'Last Order': report.lastOrderDate ? new Date(report.lastOrderDate).toLocaleDateString('en-US') : 'No orders'
+        }));
+
         // Create a worksheet and workbook
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
@@ -206,6 +217,7 @@ const Reports: React.FC = () => {
         <div className="text-gray-900">
             <div className="flex justify-between items-center mb-6">
                 <Title variant="h2">Company Reports</Title>
+                <Button label='Export to Excel' onClick={exportToExcel} className='mr-2 mt-2' />
             </div>
             <Card padding="medium">
                 <div className="flex flex-wrap gap-4 mb-6">
