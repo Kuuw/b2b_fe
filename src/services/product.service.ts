@@ -1,10 +1,11 @@
 import api from './api.config';
 import { Product, ProductCreate, ProductUpdate } from '../models/product';
 
-export const getProducts = async (page = 1, pageSize = 10, search?: string) => {
+export const getProducts = async (pageNumber = 1, pageSize = 10, Filter?: filter) => {
     const response = await api.post('/Product/GetPaged', {
-        page,
-        pageSize
+        pageNumber,
+        pageSize,
+        Filter
     });
     return response.data;
 };
@@ -29,10 +30,9 @@ export const deleteProduct = async (id: string) => {
     return response.data;
 };
 
-export const getPaged = async (page = 1, limit = 10, filter?: string) => {
-    const response = await api.post('/Product/GetPaged', {
-        page,
-        limit
-    });
-    return response.data;
+export interface filter {
+    productName?: string;
+    categoryId?: string;
+    minPrice?: number;
+    maxPrice?: number;
 }
