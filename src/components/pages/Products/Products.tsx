@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProducts, getCategories } from '../../../services';
+import { getProducts, getCategories, filter } from '../../../services';
 import { Product } from '../../../models/product';
 import { Category } from '../../../models/category';
 import Card from '../../atoms/Card';
@@ -11,6 +11,7 @@ import Pagination from '../../atoms/Pagination';
 import ProductTable from '../../molecules/ProductTable';
 import { ProductsProps } from './Products.types';
 import clsx from 'clsx';
+import { Button } from '@/components/atoms';
 
 const Products: React.FC<ProductsProps> = ({ className }) => {
     const navigate = useNavigate();
@@ -18,22 +19,41 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
-    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState<filter>({});
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [debouncedFilter, setDebouncedFilter] = useState<filter>({});
+
+    // Debounce filter changes
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedFilter(filter);
+        }, 500); // 500ms debounce
+
+        return () => clearTimeout(handler);
+    }, [filter]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [debouncedFilter, currentPage]);
 
     const fetchProducts = async () => {
         try {
             setIsLoading(true);
-            const response = await getProducts(currentPage, 10, search);
+            const response = await getProducts(currentPage, pageSize, filter);
             setProducts(response.items);
-            setTotalPages(Math.ceil(response.total / 10));
+            setTotalPages(response.totalPages);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     const fetchCategories = async () => {
         try {
@@ -46,59 +66,101 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
 
     useEffect(() => {
         fetchProducts();
-        fetchCategories();
-    }, [currentPage, search]);
-
-    const handleSearch = (query: string) => {
-        setSearch(query);
-        setCurrentPage(1);
-    };
-
-    const handleCategoryChange = (category: string) => {
-        setSelectedCategory(category);
-        setCurrentPage(1);
-    };
+    }, [currentPage, filter]);
 
     const handleProductClick = (product: Product) => {
         navigate(`/products/${product.productId}`);
     };
 
-    const categoryOptions = [
-        { value: '', label: 'All Categories' },
-        ...categories.map(category => ({
-            value: category.categoryId,
-            label: category.categoryName
-        }))
-    ];
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { value } = e.target;
+        setFilter((prev: any) => ({
+            ...prev,
+            categoryId: value === '' ? undefined : value,
+        }));
+        setCurrentPage(1);
+    }
+
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setFilter(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
     return (
         <div className={clsx("w-full min-h-screen bg-gray-50", className)}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                     <Title variant="h2">Products</Title>
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-                        <SearchField
-                            onSearch={handleSearch}
-                            placeholder="Search products..."
-                            className="w-full sm:w-64"
-                        />
-                        <Filter
-                            options={categoryOptions}
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                            placeholder="Filter by category"
-                            className="w-full sm:w-48"
+                    <div className="mb-4 flex flex-wrap gap-4 items-end">
+                        <div>
+                            <label className="block text-xs mb-1">Product Name</label>
+                            <input
+                                type="text"
+                                name="productName"
+                                value={filter.productName || ''}
+                                onChange={handleFilterChange}
+                                className="border px-2 py-1 rounded bg-white text-gray-900"
+                                placeholder="Product Name"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs mb-1">Category</label>
+                            <select
+                                name="categoryId"
+                                value={filter.categoryId || ''}
+                                onChange={handleCategoryChange}
+                                className="border px-2 py-1 rounded bg-white text-gray-900"
+                            >
+                                <option value="">All Categories</option>
+                                {categories.map((category: any) => (
+                                    <option key={category.categoryId} value={category.categoryId}>
+                                        {category.categoryName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs mb-1">Min Price</label>
+                            <input
+                                type="number"
+                                name="minPrice"
+                                value={filter.minPrice ?? ''}
+                                onChange={handleFilterChange}
+                                className="border px-2 py-1 rounded bg-white text-gray-900"
+                                placeholder="Min"
+                                min={0}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs mb-1">Max Price</label>
+                            <input
+                                type="number"
+                                name="maxPrice"
+                                value={filter.maxPrice ?? ''}
+                                onChange={handleFilterChange}
+                                className="border px-2 py-1 rounded bg-white text-gray-900"
+                                placeholder="Max"
+                                min={0}
+                            />
+                        </div>
+                        <Button
+                            label="Clear"
+                            onClick={() => setFilter({})}
+                            className="ml-2"
                         />
                     </div>
                 </div>
-                
+
                 <Card padding="medium">
-                    <ProductTable 
+                    <ProductTable
                         products={products}
                         onProductClick={handleProductClick}
                         isLoading={isLoading}
                     />
-                    {totalPages > 1 && (
+                    {totalPages > 0 && (
                         <div className="mt-4">
                             <Pagination
                                 currentPage={currentPage}
