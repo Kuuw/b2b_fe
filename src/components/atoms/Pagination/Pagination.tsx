@@ -29,10 +29,10 @@ const Pagination: React.FC<PaginationProps> = ({
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
                 className={clsx(
-                    'p-2 rounded-md',
+                    'p-2 rounded-md ',
                     currentPage === 1
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'text-gray-800 cursor-not-allowed bg-gray-400'
+                        : 'text-gray-600 hover:bg-gray-100 bg-gray-200'
                 )}
             >
                 <FiChevronLeft className="w-5 h-5" />
@@ -59,8 +59,8 @@ const Pagination: React.FC<PaginationProps> = ({
                 className={clsx(
                     'p-2 rounded-md',
                     currentPage === totalPages
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'text-gray-800 cursor-not-allowed bg-gray-400'
+                        : 'text-gray-600 hover:bg-gray-100 bg-gray-200'
                 )}
             >
                 <FiChevronRight className="w-5 h-5" />
