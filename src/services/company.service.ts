@@ -23,9 +23,22 @@ export const updateCompany = async (company: CompanyUpdate) => {
     return response.data;
 };
 
-export const getReports = async (page: number, pageSize: number) => {
-    const response = await api.get('/Company/GetReports', {
-        params: { page, pageSize },
+interface ReportFilter {
+    search?: string;
+    users: string[];
+    startDate?: string | null;
+    endDate?: string | null;
+    minSpent?: number | null;
+    maxSpent?: number | null;
+    minOrder?: number | null;
+    maxOrder?: number | null;
+}
+
+export const getReports = async (pageNumber: number, pageSize: number, filter: ReportFilter) => {
+    const response = await api.post('/Company/GetReports', {
+        pageNumber,
+        pageSize,
+        filter
     });
     return response.data;
 }
