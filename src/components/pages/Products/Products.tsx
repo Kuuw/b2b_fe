@@ -12,6 +12,7 @@ import ProductTable from '../../molecules/ProductTable';
 import { ProductsProps } from './Products.types';
 import clsx from 'clsx';
 import { Button } from '@/components/atoms';
+import RangeSlider from '@/components/atoms/RangeSlider/RangeSlider';
 
 const Products: React.FC<ProductsProps> = ({ className }) => {
     const navigate = useNavigate();
@@ -24,6 +25,8 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
     const [filter, setFilter] = useState<filter>({});
     const [selectedCategory, setSelectedCategory] = useState('');
     const [debouncedFilter, setDebouncedFilter] = useState<filter>({});
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+    const [maxPrice, setMaxPrice] = useState(1000);
 
     // Debounce filter changes
     useEffect(() => {
@@ -44,6 +47,12 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
             const response = await getProducts(currentPage, pageSize, filter);
             setProducts(response.items);
             setTotalPages(response.totalPages);
+            
+            // Only set max values and ranges if they haven't been set yet
+            if (maxPrice === 1000) {
+                setMaxPrice(response.maxPrice);
+                setPriceRange([0, response.maxPrice]);
+            }
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -89,6 +98,25 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
         }));
     };
 
+    const handlePriceRangeChange = (value: [number, number]) => {
+        setPriceRange(value);
+        setFilter((prev: any) => ({
+            ...prev,
+            minPrice: value[0],
+            maxPrice: value[1]
+        }));
+        setCurrentPage(1);
+    };
+
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    };
+
     return (
         <div className={clsx("w-full min-h-screen bg-gray-50", className)}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -122,37 +150,29 @@ const Products: React.FC<ProductsProps> = ({ className }) => {
                                 ))}
                             </select>
                         </div>
-                        <div>
-                            <label className="block text-xs mb-1">Min Price</label>
-                            <input
-                                type="number"
-                                name="minPrice"
-                                value={filter.minPrice ?? ''}
-                                onChange={handleFilterChange}
-                                className="border px-2 py-1 rounded bg-white text-gray-900"
-                                placeholder="Min"
-                                min={0}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs mb-1">Max Price</label>
-                            <input
-                                type="number"
-                                name="maxPrice"
-                                value={filter.maxPrice ?? ''}
-                                onChange={handleFilterChange}
-                                className="border px-2 py-1 rounded bg-white text-gray-900"
-                                placeholder="Max"
-                                min={0}
-                            />
-                        </div>
                         <Button
                             label="Clear"
-                            onClick={() => setFilter({})}
+                            onClick={() => {
+                                setFilter({});
+                                setPriceRange([0, maxPrice]);
+                            }}
                             className="ml-2"
                         />
                     </div>
                 </div>
+
+                <Card padding="medium" className="mb-4">
+                    <div className="w-full">
+                        <RangeSlider
+                            label="Price Range"
+                            min={0}
+                            max={maxPrice}
+                            value={priceRange}
+                            onChange={handlePriceRangeChange}
+                            formatValue={formatCurrency}
+                        />
+                    </div>
+                </Card>
 
                 <Card padding="medium">
                     <ProductTable
