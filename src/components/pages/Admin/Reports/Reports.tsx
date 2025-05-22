@@ -7,6 +7,8 @@ import Title from '@/components/atoms/Title';
 import SearchableDropdown from '@/components/atoms/SearchableDropdown';
 import { FormField } from '@/components/atoms/FormField';
 import Pagination from '@/components/atoms/Pagination';
+import RangeSlider from '@/components/atoms/RangeSlider/RangeSlider';
+import DateRange from '@/components/atoms/DateRange/DateRange';
 import { User } from '@/models/user';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';
@@ -17,6 +19,8 @@ interface ReportPagedResponse {
     pageSize: number;
     totalPages: number;
     items: Report[];
+    maxSpent: number;
+    maxOrder: number;
 }
 
 interface Report {
@@ -44,6 +48,10 @@ const Reports: React.FC = () => {
     const [maxOrder, setMaxOrder] = useState<number | null>(null);
     const [users, setUsers] = useState<User[]>([]);
     const [userSearchQuery, setUserSearchQuery] = useState('');
+    const [spentRange, setSpentRange] = useState<[number, number]>([0, 0]);
+    const [orderRange, setOrderRange] = useState<[number, number]>([0, 0]);
+    const [maxSpentValue, setMaxSpentValue] = useState(0);
+    const [maxOrderValue, setMaxOrderValue] = useState(0);
 
     const exportToExcel = () => {
         // Prepare the data for export
@@ -82,6 +90,14 @@ const Reports: React.FC = () => {
                 setReports(response.items);
                 const calculatedTotalPages = Math.ceil(response.total / pageSize);
                 setTotalPages(response.totalPages || calculatedTotalPages);
+                if (maxSpentValue === 0) {
+                    setMaxSpentValue(response.maxSpent || 0);
+                    setSpentRange([0, response.maxSpent || 0]);
+                }
+                if (maxOrderValue === 0) {
+                    setMaxOrderValue(response.maxOrderCount || 0);
+                    setOrderRange([0, response.maxOrderCount || 0]);
+                }
             } else {
                 console.log('Invalid response format');
                 setReports([]);
@@ -123,6 +139,20 @@ const Reports: React.FC = () => {
         fetchUsers(userSearchQuery);
     }, [userSearchQuery]);
 
+    const handleSpentRangeChange = (value: [number, number]) => {
+        setSpentRange(value);
+        setMinSpent(value[0]);
+        setMaxSpent(value[1]);
+        setCurrentPage(1);
+    };
+
+    const handleOrderRangeChange = (value: [number, number]) => {
+        setOrderRange(value);
+        setMinOrder(value[0]);
+        setMaxOrder(value[1]);
+        setCurrentPage(1);
+    };
+
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -150,13 +180,9 @@ const Reports: React.FC = () => {
         setCurrentPage(1);
     };
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === 'startDate') {
-            setStartDate(value ? new Date(new Date(value).setHours(23, 59, 59)) : null);
-        } else {
-            setEndDate(value ? new Date(value) : null);
-        }
+    const handleDateRangeChange = (startDate: Date | null, endDate: Date | null) => {
+        setStartDate(startDate);
+        setEndDate(endDate);
         setCurrentPage(1);
     };
 
@@ -219,96 +245,72 @@ const Reports: React.FC = () => {
                 <Title variant="h2">Company Reports</Title>
                 <Button label='Export to Excel' onClick={exportToExcel} className='mr-2 mt-2' />
             </div>
-            <Card padding="medium">
-                <div className="flex flex-wrap gap-4 mb-6">
-                    <SearchableDropdown
-                        options={userOptions}
-                        value={selectedUsers}
-                        onChange={handleUserChange}
-                        onSearch={handleUserSearch}
-                        placeholder="Filter by users..."
-                        className="w-md"
+
+            <div className="flex flex-col gap-4">
+                <Card padding="medium" className='w-full'>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-wrap gap-4">
+                            <SearchableDropdown
+                                options={userOptions}
+                                value={selectedUsers}
+                                onChange={handleUserChange}
+                                onSearch={handleUserSearch}
+                                placeholder="Filter by users..."
+                                className="w-full md:w-64 mr-3"
+                            />
+                            <div className="w-full md:w-96 mr-3">
+                                <DateRange
+                                    startDate={startDate}
+                                    endDate={endDate}
+                                    onChange={handleDateRangeChange}
+                                    label="Date Range"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-4">
+                            <div className="w-full md:w-96 mr-3">
+                                <RangeSlider
+                                    label="Spent Range"
+                                    min={0}
+                                    max={maxSpentValue}
+                                    value={spentRange}
+                                    onChange={handleSpentRangeChange}
+                                    formatValue={formatCurrency}
+                                />
+                            </div>
+                            <div className="w-full md:w-96">
+                                <RangeSlider
+                                    label="Order Range"
+                                    min={0}
+                                    max={maxOrderValue}
+                                    value={orderRange}
+                                    onChange={handleOrderRangeChange}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+
+                <Card padding="medium">
+                    <Table
+                        data={reports}
+                        columns={columns}
+                        isLoading={isLoading}
+                        emptyMessage="No reports found"
                     />
-                    <div className="flex items-center gap-2">
-                        <text className="text-gray-500 text-sm">Date Range:</text>
-                        <FormField
-                            type="date"
-                            name="startDate"
-                            value={startDate ? `${startDate.getFullYear()}-${(startDate.getMonth() + 1).toString().padStart(2, '0')}-${startDate.getDate().toString().padStart(2, '0')}` : ''}
-                            onChange={handleDateChange}
-                            placeholder="Start date"
-                            className="w-min"
-                        />
-                        <text className="text-gray-500 text-sm">to</text>
-                        <FormField
-                            type="date"
-                            name="endDate"
-                            value={endDate ? `${endDate.getFullYear()}-${(endDate.getMonth() + 1).toString().padStart(2, '0')}-${endDate.getDate().toString().padStart(2, '0')}` : ''}
-                            onChange={handleDateChange}
-                            placeholder="End date"
-                            className="w-min"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <text className="text-gray-500 text-sm">Spent Range:</text>
-                        <FormField
-                            type="text"
-                            name="minSpent"
-                            value={minSpent || ''}
-                            onChange={handleNumberChange}
-                            placeholder="Min spent"
-                            className="w-32"
-                        />
-                        <text className="text-gray-500 text-sm">to</text>
-                        <FormField
-                            type="text"
-                            name="maxSpent"
-                            value={maxSpent || ''}
-                            onChange={handleNumberChange}
-                            placeholder="Max spent"
-                            className="w-32"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <text className="text-gray-500 text-sm">Order Range:</text>
-                        <FormField
-                            type="text"
-                            name="minOrder"
-                            value={minOrder || ''}
-                            onChange={handleNumberChange}
-                            placeholder="Min orders"
-                            className="w-32"
-                        />
-                        <text className="text-gray-500 text-sm">to</text>
-                        <FormField
-                            type="text"
-                            name="maxOrder"
-                            value={maxOrder || ''}
-                            onChange={handleNumberChange}
-                            placeholder="Max orders"
-                            className="w-32"
-                        />
-                    </div>
-                </div>
 
-                <Table
-                    data={reports}
-                    columns={columns}
-                    isLoading={isLoading}
-                    emptyMessage="No reports found"
-                />
-
-                {totalPages > 0 && (
-                    <div className="mt-4 flex justify-center">
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
-                    </div>
-                )}
-            </Card>
-        </div >
+                    {totalPages > 0 && (
+                        <div className="mt-4 flex justify-center">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        </div>
+                    )}
+                </Card>
+            </div>
+        </div>
     );
 };
 
