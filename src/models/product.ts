@@ -7,8 +7,8 @@ export interface ProductImage {
 }
 
 export interface ProductStock {
-    productStockId: string;
-    quantity: number;
+    productId: string;
+    stockQuantity: number;
 }
 
 export interface Product {
