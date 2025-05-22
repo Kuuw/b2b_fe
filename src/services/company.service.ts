@@ -43,6 +43,15 @@ export const getReports = async (pageNumber: number, pageSize: number, filter: R
     return response.data;
 }
 
+export const getSelfReport = async (pageNumber: number, pageSize: number, filter: ReportFilter) => {
+    const response = await api.post('/Company/GetSelfReport', {
+        pageNumber,
+        pageSize,
+        filter
+    });
+    return response.data;
+}
+
 export const deleteCompany = async (id: string) => {
     const response = await api.delete(`/Company/${id}`);
     return response.data;
