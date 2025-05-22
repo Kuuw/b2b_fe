@@ -20,6 +20,7 @@ import AdminOrders from './components/pages/Admin/Orders/Orders';
 import AdminOrderDetail from './components/pages/Admin/Orders/OrderDetail';
 import AdminCompanies from './components/pages/Admin/Companies/Companies';
 import AdminReports from './components/pages/Admin/Reports/Reports';
+import AdminSelfReport from './components/pages/Admin/SelfReport/SelfReport';
 import { isAdmin } from './utils/jwt';
 
 const App = () => {
@@ -115,7 +116,7 @@ const AppContent = () => {
         <Route
           path="/admin"
           element={
-            isAuthenticated && userIsAdmin ? (
+            isAuthenticated ? (
               <Admin />
             ) : (
               <Navigate to="/products" replace />
@@ -153,6 +154,10 @@ const AppContent = () => {
           <Route
             path="reports"
             element={<AdminReports />}
+          />
+          <Route
+            path="self-report"
+            element={<AdminSelfReport />}
           />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
