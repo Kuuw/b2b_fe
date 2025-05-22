@@ -35,4 +35,6 @@ export interface filter {
     categoryId?: string;
     minPrice?: number;
     maxPrice?: number;
+    minStock?: number;
+    maxStock?: number;
 }
