@@ -6,4 +6,5 @@ export interface DateRangeProps {
     label?: string;
     error?: string;
     helperText?: string;
-} 
+    clearable?: boolean;
+}
