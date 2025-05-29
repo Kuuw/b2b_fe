@@ -7,4 +7,6 @@ export interface RangeSliderProps {
     className?: string;
     label?: string;
     formatValue?: (value: number) => string;
-} 
+    showInputs?: boolean;
+    inputClassName?: string;
+}
