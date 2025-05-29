@@ -8,7 +8,7 @@ import SearchableDropdown from '@/components/atoms/SearchableDropdown';
 import { FormField } from '@/components/atoms/FormField';
 import Pagination from '@/components/atoms/Pagination';
 import RangeSlider from '@/components/atoms/RangeSlider/RangeSlider';
-import DateRange from '@/components/atoms/DateRange/DateRange';
+import DateRange from '@/components/molecules/DateRange/DateRange';
 import { User } from '@/models/user';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';

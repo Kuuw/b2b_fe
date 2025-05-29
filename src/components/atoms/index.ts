@@ -5,4 +5,5 @@ export * from './Title';
 export * from './Table';
 export * from './SearchField';
 export * from './Filter';
-export * from './Pagination'; 
+export * from './Pagination';
+export * from './DatePicker';

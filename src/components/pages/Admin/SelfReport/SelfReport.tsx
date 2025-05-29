@@ -3,7 +3,7 @@ import { getSelfReport } from '@/services/company.service';
 import Card from '@/components/atoms/Card';
 import Table, { TableColumn } from '@/components/atoms/Table';
 import Title from '@/components/atoms/Title';
-import DateRange from '@/components/atoms/DateRange/DateRange';
+import DateRange from '@/components/molecules/DateRange/DateRange';
 import * as XLSX from 'xlsx';
 import { Button } from '@/components/atoms';
 
